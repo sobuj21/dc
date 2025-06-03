@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inch Value Calculator</title>
+    <title>Distance Calculator</title>
     <style>
         /* Import Google Font */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
@@ -62,6 +62,8 @@
             background: -webkit-linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            cursor: pointer; /* Make H1 clickable for reset */
+            user-select: none; /* Prevent text selection on click */
         }
 
         p.description {
@@ -226,23 +228,23 @@
 <body>
 
     <main class="main-container">
-        <h1>Distance Calculator</h1>
+        <h1 id="main-title">Distance Calculator</h1>
         <p class="description">Select an option before performing the calculation</p>
         
         <form id="calculator-form">
             <div class="radio-group">
-                <input type="radio" id="table1" name="table_selection" value="table1" checked>
-                <label for="table1">DC-4</label>
+                <input type="radio" id="tableDC4" name="table_selection" value="table1" checked>
+                <label for="tableDC4">DC-4</label>
                 
-                <input type="radio" id="table2" name="table_selection" value="table2">
-                <label for="table2">SC-2</label>
+                <input type="radio" id="tableSC2" name="table_selection" value="table2">
+                <label for="tableSC2">SC-2</label>
             </div>
             
             <div class="input-group">
                 <input type="number" id="inch-input" placeholder="Enter inch value (e.g., 1.5, 4, 8.5)" step="any" required>
             </div>
             
-            <button type="submit" id="submit-button">Calculate Distance</button>
+            <button type="submit" id="submit-button">Calculate Values</button>
         </form>
         
         <div id="results">
@@ -261,12 +263,32 @@
         const resultsOutput = document.getElementById('results-output');
         const resultsTitle = document.getElementById('results-title');
         const errorMessage = document.getElementById('error-message');
+        const mainTitle = document.getElementById('main-title'); // Get reference to H1
+        const radioDC4 = document.getElementById('tableDC4'); // Get reference to DC-4 radio
 
         // Add event listener for form submission
         form.addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent default form submission
             calculateAndDisplay();
         });
+
+        // Add event listener for main title click (reset functionality)
+        mainTitle.addEventListener('click', function() {
+            resetCalculator();
+        });
+
+        // Function to reset the calculator state
+        function resetCalculator() {
+            inchInput.value = ''; // Clear input field
+            resultsOutput.innerHTML = ''; // Clear results
+            errorMessage.textContent = ''; // Clear error messages
+            resultsTitle.style.display = 'none'; // Hide results title
+            if(radioDC4) { // Check if the radio button exists
+                 radioDC4.checked = true; // Reset radio button to DC-4 (default)
+            }
+            inchInput.focus(); // Optionally focus on the input field
+        }
+
 
         // Main function to calculate and display results
         function calculateAndDisplay() {
@@ -281,7 +303,7 @@
 
             // 2. Validate inputs
             if (!selectedTableRadio) {
-                errorMessage.textContent = 'Error: Please select either Table 1 or Table 2.';
+                errorMessage.textContent = 'Error: Please select either DC-4 or SC-2.';
                 return;
             }
             if (inchValueString.trim() === '') {
@@ -314,26 +336,27 @@
             // 4. Define row calculation functions based on the discovered patterns from the PDF
             // These formulas take the calculated index 'i' as input.
             const calculations = {
-                // Formula for Table 1, Row 1: (1.5 * i) + 10
+                // Formula for Table 1 (DC-4), Row 1: (1.5 * i) + 10
                 t1_r1: (index) => 1.5 * index + 10,
-                // Formula for Table 1, Row 2 (also Table 2, Row 1): (0.5 * i) + 7
+                // Formula for Table 1 (DC-4), Row 2 (also Table 2 (SC-2), Row 1): (0.5 * i) + 7
                 t1_r2_t2_r1: (index) => 0.5 * index + 7,
-                // Formula for Table 1, Row 3 (also Table 2, Row 2): (-0.5 * i) + 4
+                // Formula for Table 1 (DC-4), Row 3 (also Table 2 (SC-2), Row 2): (-0.5 * i) + 4
                 t1_r3_t2_r2: (index) => -0.5 * index + 4,
-                // Formula for Table 1, Row 4: (-1.5 * i) + 1
+                // Formula for Table 1 (DC-4), Row 4: (-1.5 * i) + 1
                 t1_r4: (index) => -1.5 * index + 1,
             };
 
             // 5. Calculate results based on the selected table and the index 'i'
             let outputValues = [];
-            if (selectedTable === 'table1') {
+            // 'table1' corresponds to DC-4, 'table2' to SC-2
+            if (selectedTable === 'table1') { // DC-4 selected
                 outputValues.push(calculations.t1_r1(i));
                 outputValues.push(calculations.t1_r2_t2_r1(i));
                 outputValues.push(calculations.t1_r3_t2_r2(i));
                 outputValues.push(calculations.t1_r4(i));
-            } else { // selectedTable === 'table2'
-                outputValues.push(calculations.t1_r2_t2_r1(i)); // Table 2 Row 1 is same as Table 1 Row 2
-                outputValues.push(calculations.t1_r3_t2_r2(i)); // Table 2 Row 2 is same as Table 1 Row 3
+            } else { // SC-2 selected (value 'table2')
+                outputValues.push(calculations.t1_r2_t2_r1(i)); 
+                outputValues.push(calculations.t1_r3_t2_r2(i)); 
             }
 
             // 6. Display the calculated results
