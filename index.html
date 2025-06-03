@@ -10,15 +10,16 @@
 
         /* CSS Variables for theming */
         :root {
-            --background-color: #1a1a2e; /* Dark blue-purple background */
-            --container-color: rgba(22, 22, 46, 0.85); /* Slightly transparent container */
-            --primary-color: #00a8ff; /* Bright blue for accents */
-            --secondary-color: #9c88ff; /* Lavender for accents */
-            --text-color: #e0e0e0; /* Light grey for text */
-            --light-text-color: #a0a0c0; /* Lighter grey for secondary text */
-            --border-color: rgba(0, 168, 255, 0.3); /* Translucent blue border */
-            --shadow-color: rgba(0, 168, 255, 0.2); /* Translucent blue shadow */
-            --error-color: #ff4757; /* Red for error messages */
+            --background-color: #1a1a2e;
+            --container-color: rgba(22, 22, 46, 0.85);
+            --primary-color: #00a8ff;
+            --secondary-color: #9c88ff;
+            --text-color: #e0e0e0;
+            --light-text-color: #a0a0c0;
+            --border-color: rgba(0, 168, 255, 0.3);
+            --shadow-color: rgba(0, 168, 255, 0.2);
+            --error-color: #ff4757;
+            --switch-off-color: #777;
         }
 
         /* Basic Reset */
@@ -37,37 +38,35 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            /* Subtle gradient background */
             background-image: linear-gradient(45deg, var(--background-color) 0%, #16213e 100%);
         }
 
         .main-container {
             width: 100%;
-            max-width: 500px; /* Max width for larger screens */
+            max-width: 500px;
             background: var(--container-color);
             border: 1px solid var(--border-color);
-            border-radius: 20px; /* Rounded corners */
-            padding: 30px 40px; /* Responsive padding */
-            box-shadow: 0 8px 32px 0 var(--shadow-color); /* Soft shadow */
-            backdrop-filter: blur(10px); /* Frosted glass effect */
-            -webkit-backdrop-filter: blur(10px); /* Safari support for backdrop filter */
+            border-radius: 20px;
+            padding: 30px 40px;
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             text-align: center;
         }
 
         h1 {
-            font-size: clamp(1.8rem, 5vw, 2.2rem); /* Responsive font size */
+            font-size: clamp(1.8rem, 5vw, 2.2rem);
             font-weight: 600;
             margin-bottom: 10px;
-            /* Gradient text effect */
             background: -webkit-linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            cursor: pointer; /* Make H1 clickable for reset */
-            user-select: none; /* Prevent text selection on click */
+            cursor: pointer;
+            user-select: none;
         }
 
         p.description {
-            font-size: clamp(0.9rem, 2.5vw, 1rem); /* Responsive font size */
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             color: var(--light-text-color);
             margin-bottom: 30px;
         }
@@ -75,43 +74,98 @@
         #calculator-form {
             display: flex;
             flex-direction: column;
-            gap: 25px; /* Space between form elements */
+            gap: 25px;
         }
 
         .radio-group {
             display: flex;
             justify-content: center;
-            gap: 15px; /* Space between radio buttons */
+            align-items: center; /* Align items vertically for switch */
+            gap: 15px;
             margin-bottom: 10px;
         }
+        
+        .sc2-option-container { /* Container for switch and SC-2 radio */
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between SC-2 radio/label and switch */
+        }
 
-        .radio-group label {
+        .radio-group label { /* General label styling */
             display: flex;
             align-items: center;
             cursor: pointer;
-            padding: 10px 20px;
+            padding: 10px 15px; 
             border: 2px solid var(--border-color);
-            border-radius: 50px; /* Pill-shaped labels */
+            border-radius: 50px;
             transition: all 0.3s ease;
             font-size: 0.9rem;
         }
+         .radio-group label.sc2-label { 
+             /* No specific style needed now as switch is after */
+         }
+
 
         .radio-group input[type="radio"] {
-            display: none; /* Hide native radio button */
+            display: none;
         }
 
         .radio-group label:hover {
-            background: var(--border-color); /* Hover effect */
+            background: var(--border-color);
         }
 
-        /* Style for checked radio button label */
         .radio-group input[type="radio"]:checked + label {
             background: var(--primary-color);
             border-color: var(--primary-color);
-            color: var(--background-color); /* Dark text on bright background */
+            color: var(--background-color);
             font-weight: 500;
-            box-shadow: 0 0 15px var(--primary-color); /* Glow effect */
+            box-shadow: 0 0 15px var(--primary-color);
         }
+
+        /* Toggle Switch Styles */
+        .toggle-switch-container {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .toggle-switch-checkbox { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-switch-label { 
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--switch-off-color);
+            transition: .4s;
+            border-radius: 20px; 
+            padding: 0; 
+            border: none; 
+        }
+        .toggle-switch-label:before { 
+            position: absolute;
+            content: "";
+            height: 16px; 
+            width: 16px;  
+            left: 2px;   
+            bottom: 2px; 
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%; 
+        }
+        .toggle-switch-checkbox:checked + .toggle-switch-label {
+            background-color: var(--primary-color); 
+        }
+        .toggle-switch-checkbox:checked + .toggle-switch-label:before {
+            transform: translateX(20px); 
+        }
+        /* End Toggle Switch Styles */
+
 
         .input-group {
             position: relative;
@@ -122,9 +176,9 @@
             padding: 15px 20px;
             font-size: 1rem;
             color: var(--text-color);
-            background-color: transparent; /* Transparent background */
+            background-color: transparent;
             border: 2px solid var(--border-color);
-            border-radius: 10px; /* Rounded input field */
+            border-radius: 10px;
             outline: none;
             transition: all 0.3s ease;
         }
@@ -134,31 +188,31 @@
         }
 
         #inch-input:focus {
-            border-color: var(--primary-color); /* Highlight on focus */
-            box-shadow: 0 0 15px var(--shadow-color); /* Glow effect on focus */
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px var(--shadow-color);
         }
 
         #submit-button {
             padding: 15px 20px;
             font-size: 1.1rem;
             font-weight: 500;
-            color: #fff; /* White text on button */
-            background-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradient button */
+            color: #fff;
+            background-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             border: none;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Button shadow */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         #submit-button:hover {
-            transform: translateY(-2px); /* Slight lift on hover */
-            box-shadow: 0 6px 20px var(--shadow-color); /* Enhanced shadow on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-color);
         }
 
         #results {
             margin-top: 35px;
-            min-height: 100px; /* Reserve space for results */
+            min-height: 100px;
         }
         
         #results-title {
@@ -169,19 +223,19 @@
 
         .results-container {
             display: flex;
-            flex-wrap: wrap; /* Allow results to wrap on smaller screens */
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 15px; /* Space between result values */
+            gap: 15px;
             margin-top: 15px;
         }
         
         .result-value {
             background-color: var(--border-color);
             padding: 12px 20px;
-            border-radius: 8px; /* Rounded corners for result items */
-            font-size: clamp(1rem, 4vw, 1.2rem); /* Responsive font size for results */
+            border-radius: 8px;
+            font-size: clamp(1rem, 4vw, 1.2rem);
             font-weight: 500;
-            animation: fadeIn 0.5s ease forwards; /* Fade-in animation */
+            animation: fadeIn 0.5s ease forwards;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
@@ -189,39 +243,23 @@
             color: var(--error-color);
             margin-top: 15px;
             font-weight: 500;
-            height: 20px; /* Reserve space for error message */
+            height: 20px;
             font-size: 0.9rem;
         }
         
-        /* Fade-in animation for results */
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Media query for smaller screens */
         @media (max-width: 540px) {
-            .main-container {
-                padding: 25px 20px; /* Adjust padding for smaller screens */
-            }
-             .radio-group label {
-                padding: 8px 15px;
-                font-size: 0.85rem;
-            }
-            #inch-input {
-                padding: 12px 15px;
-                font-size: 0.95rem;
-            }
-            #submit-button {
-                padding: 12px 15px;
-                font-size: 1rem;
-            }
+            .main-container { padding: 25px 20px; }
+            .radio-group label { padding: 8px 15px; font-size: 0.85rem; }
+            #inch-input { padding: 12px 15px; font-size: 0.95rem; }
+            #submit-button { padding: 12px 15px; font-size: 1rem; }
+            .toggle-switch-container { width: 36px; height: 18px; }
+            .toggle-switch-label:before { height: 14px; width: 14px; }
+            .toggle-switch-checkbox:checked + .toggle-switch-label:before { transform: translateX(18px); }
         }
     </style>
 </head>
@@ -236,8 +274,14 @@
                 <input type="radio" id="tableDC4" name="table_selection" value="table1" checked>
                 <label for="tableDC4">DC-4</label>
                 
-                <input type="radio" id="tableSC2" name="table_selection" value="table2">
-                <label for="tableSC2">SC-2</label>
+                <div class="sc2-option-container">
+                    <input type="radio" id="tableSC2" name="table_selection" value="table2">
+                    <label for="tableSC2" class="sc2-label">SC-2</label>
+                    <div class="toggle-switch-container" title="Toggle Last Input Mode">
+                        <input type="checkbox" id="last-input-mode-toggle" class="toggle-switch-checkbox">
+                        <label for="last-input-mode-toggle" class="toggle-switch-label"></label>
+                    </div>
+                </div>
             </div>
             
             <div class="input-group">
@@ -250,111 +294,149 @@
         <div id="results">
             <h2 id="results-title" style="display:none;">Calculated Distance:</h2>
             <div id="error-message"></div>
-            <div class="results-container" id="results-output">
-                </div>
+            <div class="results-container" id="results-output"></div>
         </div>
-
     </main>
 
     <script>
-        // Get references to DOM elements
+        // DOM Elements
         const form = document.getElementById('calculator-form');
         const inchInput = document.getElementById('inch-input');
         const resultsOutput = document.getElementById('results-output');
         const resultsTitle = document.getElementById('results-title');
         const errorMessage = document.getElementById('error-message');
-        const mainTitle = document.getElementById('main-title'); // Get reference to H1
+        const mainTitle = document.getElementById('main-title');
         const radioDC4 = document.getElementById('tableDC4'); 
         const radioSC2 = document.getElementById('tableSC2');
+        const lastInputModeToggle = document.getElementById('last-input-mode-toggle');
+
+        // State variables
+        let isLastInputMode = false;
+        let activeCalcString = ""; // Stores the string for "last input mode" calculation
 
         // --- EVENT LISTENERS ---
-
-        // Listener for form submission (Enter key or click submit button)
         form.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
             calculateAndDisplay();
         });
 
-        // Listener for main title click (reset functionality)
         mainTitle.addEventListener('click', function() {
             resetCalculator();
         });
 
-        // Listener for automatic calculation on inch input change
-        inchInput.addEventListener('input', function() {
-            calculateAndDisplay();
+        lastInputModeToggle.addEventListener('change', function() {
+            isLastInputMode = this.checked;
+            activeCalcString = ""; // Reset active string when mode changes
+            if (!isLastInputMode) { // If toggled OFF
+                inchInput.value = ''; // Clear the visual input field
+            }
+            calculateAndDisplay(); // Recalculate based on new mode / cleared input
         });
 
-        // Listeners for automatic calculation on radio button change
+        inchInput.addEventListener('input', function(event) {
+            if (isLastInputMode) {
+                const inputType = event.inputType;
+                const data = event.data;
+
+                if (inputType === 'insertText' && data) {
+                    const char = data;
+                    if (char >= '0' && char <= '9') { // Digit typed
+                        if (activeCalcString.endsWith('.')) {
+                            activeCalcString += char; // e.g., "1." + "5" -> "1.5"
+                        } else {
+                            activeCalcString = char; // Resets to the new digit, e.g., "4" then "5" -> "5"
+                        }
+                    } else if (char === '.') { // Decimal point typed
+                        if (activeCalcString.match(/^[0-9]+$/)) { // If current is like "1", "12"
+                            activeCalcString += '.'; // Becomes "1.", "12."
+                        } else if (activeCalcString === "" || !activeCalcString.includes('.')){ // If current is empty or does not have a dot
+                             activeCalcString = "0."; // Start new with "0." if empty or make it "0." if it's not a number
+                        }
+                    } else { // Non-numeric, non-dot character
+                        activeCalcString = ""; // Reset
+                    }
+                } else if (inputType === 'deleteContentBackward') {
+                    if (activeCalcString.length > 0) {
+                        activeCalcString = activeCalcString.slice(0, -1);
+                    }
+                } else if (inputType === 'insertFromPaste') {
+                    const pastedText = (event.clipboardData || window.clipboardData)?.getData('text/plain').trim();
+                    if (pastedText) {
+                        // Check if pasted text is a valid number string
+                        if (/^-?\d*\.?\d+$/.test(pastedText) && !isNaN(parseFloat(pastedText)) && isFinite(parseFloat(pastedText))) {
+                            activeCalcString = pastedText;
+                        } else {
+                            activeCalcString = "";
+                        }
+                    }
+                }
+                // For other input types, activeCalcString might not perfectly reflect the "latest typed number part"
+                // but this covers common typing, backspace, and paste scenarios.
+            }
+            calculateAndDisplay(); // Always recalculate on input
+        });
+
         if (radioDC4) {
             radioDC4.addEventListener('change', function() {
-                if (this.checked) { // Ensure it's the one being selected
-                    calculateAndDisplay();
-                }
+                if (this.checked) calculateAndDisplay();
             });
         }
         if (radioSC2) {
             radioSC2.addEventListener('change', function() {
-                 if (this.checked) { // Ensure it's the one being selected
-                    calculateAndDisplay();
-                }
+                 if (this.checked) calculateAndDisplay();
             });
         }
 
         // --- FUNCTIONS ---
-
-        // Function to reset the calculator state
         function resetCalculator() {
-            inchInput.value = ''; // Clear input field
-            resultsOutput.innerHTML = ''; // Clear results
-            errorMessage.textContent = ''; // Clear error messages
-            resultsTitle.style.display = 'none'; // Hide results title
-            if(radioDC4) { 
-                 radioDC4.checked = true; // Reset radio button to DC-4 (default)
-            }
-            // inchInput.focus(); // Optionally focus on the input field - can be annoying with auto-calc
-            calculateAndDisplay(); // Recalculate for empty/default state
+            inchInput.value = '';
+            resultsOutput.innerHTML = '';
+            errorMessage.textContent = '';
+            resultsTitle.style.display = 'none';
+            if(radioDC4) radioDC4.checked = true;
+            
+            // Reset toggle switch and its mode
+            if(lastInputModeToggle) lastInputModeToggle.checked = false;
+            isLastInputMode = false;
+            activeCalcString = "";
+
+            calculateAndDisplay(); 
         }
 
-
-        // Main function to calculate and display results
         function calculateAndDisplay() {
-            // Clear previous results and error messages (except for the error message itself if it's about input format)
             resultsOutput.innerHTML = '';
-            // errorMessage.textContent = ''; // Keep error message if it's about invalid input type
             
-            // 1. Get user inputs
             const selectedTableRadio = document.querySelector('input[name="table_selection"]:checked');
-            const inchValueString = inchInput.value;
+            let inchValueString;
 
-            // 2. Validate inputs
+            if (isLastInputMode) {
+                inchValueString = activeCalcString;
+            } else {
+                inchValueString = inchInput.value;
+            }
+
             if (!selectedTableRadio) {
                 errorMessage.textContent = 'Error: Please select either DC-4 or SC-2.';
                 resultsTitle.style.display = 'none';
                 return;
             }
             
-            // If input is empty, clear results and hide title, but don't show an error yet
             if (inchValueString.trim() === '') {
                 resultsTitle.style.display = 'none';
-                errorMessage.textContent = ''; // Clear previous errors if input is now empty
+                errorMessage.textContent = '';
                 return;
             }
 
             const inchValue = parseFloat(inchValueString);
             if (isNaN(inchValue)) {
-                errorMessage.textContent = 'Error: Please enter a valid number for the inch value.';
+                errorMessage.textContent = `Error: "${inchValueString}" is not a valid number.`;
                 resultsTitle.style.display = 'none';
                 return;
             }
             
-            // If validation passes, clear any previous error messages
-            errorMessage.textContent = '';
-
+            errorMessage.textContent = ''; // Clear error if input is valid
 
             const selectedTable = selectedTableRadio.value;
-
-            // 3. Determine the calculation index 'i' based on the inch value
             let i;
             if (inchValue > 2) {
                 i = inchValue;
@@ -362,7 +444,6 @@
                 i = 2 * inchValue - 2;
             }
 
-            // 4. Define row calculation functions
             const calculations = {
                 t1_r1: (index) => 1.5 * index + 10,
                 t1_r2_t2_r1: (index) => 0.5 * index + 7,
@@ -370,19 +451,17 @@
                 t1_r4: (index) => -1.5 * index + 1,
             };
 
-            // 5. Calculate results
             let outputValues = [];
-            if (selectedTable === 'table1') { // DC-4 selected
+            if (selectedTable === 'table1') {
                 outputValues.push(calculations.t1_r1(i));
                 outputValues.push(calculations.t1_r2_t2_r1(i));
                 outputValues.push(calculations.t1_r3_t2_r2(i));
                 outputValues.push(calculations.t1_r4(i));
-            } else { // SC-2 selected (value 'table2')
+            } else {
                 outputValues.push(calculations.t1_r2_t2_r1(i)); 
                 outputValues.push(calculations.t1_r3_t2_r2(i)); 
             }
 
-            // 6. Display the calculated results
             if (outputValues.length > 0) {
                 resultsTitle.style.display = 'block'; 
                 outputValues.forEach((value, index) => {
@@ -393,18 +472,13 @@
                     resultElement.style.animationDelay = `${index * 0.1}s`; 
                     resultsOutput.appendChild(resultElement);
                 });
-            } else if (!errorMessage.textContent) { // Only show this if no other error is present
+            } else if (!errorMessage.textContent) {
                 resultsTitle.style.display = 'none';
                 errorMessage.textContent = 'No results to display for the current input.';
             }
         }
         
-        // Initial calculation on page load for default values (if any, or to clear things)
-        // Or, if you prefer the fields to be empty on load, this can be removed or resetCalculator can be called.
-        // calculateAndDisplay(); 
-        // Calling resetCalculator on load to ensure a clean state.
-        resetCalculator();
-
+        resetCalculator(); // Initial call to set a clean state
     </script>
 </body>
 </html>
