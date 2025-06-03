@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inch Value Calculator</title>
+    <style>
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+        /* CSS Variables for theming */
+        :root {
+            --background-color: #1a1a2e; /* Dark blue-purple background */
+            --container-color: rgba(22, 22, 46, 0.85); /* Slightly transparent container */
+            --primary-color: #00a8ff; /* Bright blue for accents */
+            --secondary-color: #9c88ff; /* Lavender for accents */
+            --text-color: #e0e0e0; /* Light grey for text */
+            --light-text-color: #a0a0c0; /* Lighter grey for secondary text */
+            --border-color: rgba(0, 168, 255, 0.3); /* Translucent blue border */
+            --shadow-color: rgba(0, 168, 255, 0.2); /* Translucent blue shadow */
+            --error-color: #ff4757; /* Red for error messages */
+        }
+
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            /* Subtle gradient background */
+            background-image: linear-gradient(45deg, var(--background-color) 0%, #16213e 100%);
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 500px; /* Max width for larger screens */
+            background: var(--container-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px; /* Rounded corners */
+            padding: 30px 40px; /* Responsive padding */
+            box-shadow: 0 8px 32px 0 var(--shadow-color); /* Soft shadow */
+            backdrop-filter: blur(10px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(10px); /* Safari support for backdrop filter */
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 2.2rem); /* Responsive font size */
+            font-weight: 600;
+            margin-bottom: 10px;
+            /* Gradient text effect */
+            background: -webkit-linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.description {
+            font-size: clamp(0.9rem, 2.5vw, 1rem); /* Responsive font size */
+            color: var(--light-text-color);
+            margin-bottom: 30px;
+        }
+        
+        #calculator-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px; /* Space between form elements */
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Space between radio buttons */
+            margin-bottom: 10px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px; /* Pill-shaped labels */
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none; /* Hide native radio button */
+        }
+
+        .radio-group label:hover {
+            background: var(--border-color); /* Hover effect */
+        }
+
+        /* Style for checked radio button label */
+        .radio-group input[type="radio"]:checked + label {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--background-color); /* Dark text on bright background */
+            font-weight: 500;
+            box-shadow: 0 0 15px var(--primary-color); /* Glow effect */
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        #inch-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1rem;
+            color: var(--text-color);
+            background-color: transparent; /* Transparent background */
+            border: 2px solid var(--border-color);
+            border-radius: 10px; /* Rounded input field */
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #inch-input::placeholder {
+            color: var(--light-text-color);
+        }
+
+        #inch-input:focus {
+            border-color: var(--primary-color); /* Highlight on focus */
+            box-shadow: 0 0 15px var(--shadow-color); /* Glow effect on focus */
+        }
+
+        #submit-button {
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #fff; /* White text on button */
+            background-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradient button */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Button shadow */
+        }
+
+        #submit-button:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 6px 20px var(--shadow-color); /* Enhanced shadow on hover */
+        }
+
+        #results {
+            margin-top: 35px;
+            min-height: 100px; /* Reserve space for results */
+        }
+        
+        #results-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .results-container {
+            display: flex;
+            flex-wrap: wrap; /* Allow results to wrap on smaller screens */
+            justify-content: center;
+            gap: 15px; /* Space between result values */
+            margin-top: 15px;
+        }
+        
+        .result-value {
+            background-color: var(--border-color);
+            padding: 12px 20px;
+            border-radius: 8px; /* Rounded corners for result items */
+            font-size: clamp(1rem, 4vw, 1.2rem); /* Responsive font size for results */
+            font-weight: 500;
+            animation: fadeIn 0.5s ease forwards; /* Fade-in animation */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #error-message {
+            color: var(--error-color);
+            margin-top: 15px;
+            font-weight: 500;
+            height: 20px; /* Reserve space for error message */
+            font-size: 0.9rem;
+        }
+        
+        /* Fade-in animation for results */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Media query for smaller screens */
+        @media (max-width: 540px) {
+            .main-container {
+                padding: 25px 20px; /* Adjust padding for smaller screens */
+            }
+             .radio-group label {
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+            #inch-input {
+                padding: 12px 15px;
+                font-size: 0.95rem;
+            }
+            #submit-button {
+                padding: 12px 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="main-container">
+        <h1>Distance Calculator</h1>
+        <p class="description">Select an option before performing the calculation</p>
+        
+        <form id="calculator-form">
+            <div class="radio-group">
+                <input type="radio" id="table1" name="table_selection" value="table1" checked>
+                <label for="table1">DC-4</label>
+                
+                <input type="radio" id="table2" name="table_selection" value="table2">
+                <label for="table2">SC-2</label>
+            </div>
+            
+            <div class="input-group">
+                <input type="number" id="inch-input" placeholder="Enter inch value (e.g., 1.5, 4, 8.5)" step="any" required>
+            </div>
+            
+            <button type="submit" id="submit-button">Calculate Distance</button>
+        </form>
+        
+        <div id="results">
+            <h2 id="results-title" style="display:none;">Calculated Distance:</h2>
+            <div id="error-message"></div>
+            <div class="results-container" id="results-output">
+                </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Get references to DOM elements
+        const form = document.getElementById('calculator-form');
+        const inchInput = document.getElementById('inch-input');
+        const resultsOutput = document.getElementById('results-output');
+        const resultsTitle = document.getElementById('results-title');
+        const errorMessage = document.getElementById('error-message');
+
+        // Add event listener for form submission
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            calculateAndDisplay();
+        });
+
+        // Main function to calculate and display results
+        function calculateAndDisplay() {
+            // Clear previous results and error messages
+            resultsOutput.innerHTML = '';
+            errorMessage.textContent = '';
+            resultsTitle.style.display = 'none'; // Hide results title initially
+
+            // 1. Get user inputs
+            const selectedTableRadio = document.querySelector('input[name="table_selection"]:checked');
+            const inchValueString = inchInput.value;
+
+            // 2. Validate inputs
+            if (!selectedTableRadio) {
+                errorMessage.textContent = 'Error: Please select either Table 1 or Table 2.';
+                return;
+            }
+            if (inchValueString.trim() === '') {
+                errorMessage.textContent = 'Error: Please enter an inch value.';
+                return;
+            }
+            const inchValue = parseFloat(inchValueString);
+            if (isNaN(inchValue)) {
+                errorMessage.textContent = 'Error: Please enter a valid number for the inch value.';
+                return;
+            }
+
+            const selectedTable = selectedTableRadio.value;
+
+            // 3. Determine the calculation index 'i' based on the inch value
+            // This logic was derived from analyzing the provided PDF data patterns.
+            // For inch values > 2, the index 'i' is the inch value itself.
+            // For inch values <= 2 (e.g., 1.5, 2), a linear mapping is used: i = 2 * inchValue - 2.
+            // This ensures that:
+            //   - if inchValue = 1.5, i = 2*1.5 - 2 = 1
+            //   - if inchValue = 2,   i = 2*2   - 2 = 2
+            //   - if inchValue = 3,   i = 3 (since 3 > 2)
+            let i;
+            if (inchValue > 2) {
+                i = inchValue;
+            } else { 
+                i = 2 * inchValue - 2;
+            }
+
+            // 4. Define row calculation functions based on the discovered patterns from the PDF
+            // These formulas take the calculated index 'i' as input.
+            const calculations = {
+                // Formula for Table 1, Row 1: (1.5 * i) + 10
+                t1_r1: (index) => 1.5 * index + 10,
+                // Formula for Table 1, Row 2 (also Table 2, Row 1): (0.5 * i) + 7
+                t1_r2_t2_r1: (index) => 0.5 * index + 7,
+                // Formula for Table 1, Row 3 (also Table 2, Row 2): (-0.5 * i) + 4
+                t1_r3_t2_r2: (index) => -0.5 * index + 4,
+                // Formula for Table 1, Row 4: (-1.5 * i) + 1
+                t1_r4: (index) => -1.5 * index + 1,
+            };
+
+            // 5. Calculate results based on the selected table and the index 'i'
+            let outputValues = [];
+            if (selectedTable === 'table1') {
+                outputValues.push(calculations.t1_r1(i));
+                outputValues.push(calculations.t1_r2_t2_r1(i));
+                outputValues.push(calculations.t1_r3_t2_r2(i));
+                outputValues.push(calculations.t1_r4(i));
+            } else { // selectedTable === 'table2'
+                outputValues.push(calculations.t1_r2_t2_r1(i)); // Table 2 Row 1 is same as Table 1 Row 2
+                outputValues.push(calculations.t1_r3_t2_r2(i)); // Table 2 Row 2 is same as Table 1 Row 3
+            }
+
+            // 6. Display the calculated results
+            if (outputValues.length > 0) {
+                resultsTitle.style.display = 'block'; // Show results title
+                outputValues.forEach((value, index) => {
+                    const resultElement = document.createElement('div');
+                    resultElement.className = 'result-value';
+                    // Format to a reasonable number of decimal places if not an integer,
+                    // or if it's a very small number that might show in scientific notation.
+                    let formattedValue = Number.isInteger(value) ? value : parseFloat(value.toFixed(4));
+                    resultElement.textContent = formattedValue;
+                    resultElement.style.animationDelay = `${index * 0.1}s`; // Staggered animation
+                    resultsOutput.appendChild(resultElement);
+                });
+            } else {
+                errorMessage.textContent = 'No results to display for the given input.';
+            }
+        }
+    </script>
+</body>
+</html>
