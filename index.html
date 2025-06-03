@@ -285,7 +285,8 @@
             </div>
             
             <div class="input-group">
-                <input type="number" id="inch-input" placeholder="Enter value (e.g., 1.5, 2, 3, 4, 5, 6)" step="any" required>
+                <!-- Changed placeholder and removed type="number" to allow full control with keydown -->
+                <input type="text" id="inch-input" placeholder="Enter value (e.g., 1.5, 3, 4, 2, 5, 6)" required>
             </div>
             
             <button type="submit" id="submit-button">Calculate Values</button>
@@ -312,18 +313,18 @@
 
         // State variables
         let isLastInputMode = false;
-        let activeCalcString = ""; // Stores the string for "last input mode" calculation
+        let activeCalcString = ""; 
 
         // --- EVENT LISTENERS ---
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             calculateAndDisplay();
-            inchInput.focus(); // Keep focus after explicit submit
+            inchInput.focus(); 
         });
 
         mainTitle.addEventListener('click', function() {
             resetCalculator();
-            inchInput.focus(); // Focus after reset
+            inchInput.focus(); 
         });
 
         lastInputModeToggle.addEventListener('change', function() {
@@ -332,44 +333,130 @@
             if (!isLastInputMode) { 
                 inchInput.value = ''; 
             }
+            // When toggling off, ensure the visual input matches the (now empty) activeCalcString for consistency
+            // or if toggling on, and inchInput has content, it might be confusing.
+            // For now, clearing visual input when toggling OFF is the main behavior.
             calculateAndDisplay(); 
-            inchInput.focus(); // Focus after toggle change
+            inchInput.focus(); 
         });
+
+        // Input restriction: Allow only numbers and one decimal point
+        inchInput.addEventListener('keydown', function(event) {
+            const key = event.key;
+            const currentValue = event.target.value;
+            const allowedKeys = [
+                'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'
+            ];
+
+            if (allowedKeys.includes(key)) {
+                return; // Allow control keys
+            }
+
+            if (key === '.') {
+                // For "Last Input Mode", we check activeCalcString for existing decimal.
+                // For normal mode, we check the visual input field's value.
+                if (isLastInputMode) {
+                    if (activeCalcString.includes('.')) {
+                        event.preventDefault();
+                    }
+                } else {
+                    if (currentValue.includes('.')) {
+                        event.preventDefault();
+                    }
+                }
+                return; // Allow if no decimal yet, otherwise it's prevented above
+            }
+
+            if (!/^[0-9]$/.test(key)) { // If not a digit
+                event.preventDefault();
+            }
+        });
+
 
         inchInput.addEventListener('input', function(event) {
             if (isLastInputMode) {
-                const inputType = event.inputType;
-                const data = event.data;
+                // The 'input' event fires after 'keydown'.
+                // We need to reconstruct activeCalcString based on the new visual input,
+                // but only considering the "latest typed number part".
+                // This logic becomes more complex if we strictly adhere to "latest typed number part"
+                // while the visual input field is also being restricted by keydown.
 
-                if (inputType === 'insertText' && data) {
-                    const char = data;
-                    if (char >= '0' && char <= '9') { 
-                        if (activeCalcString.endsWith('.')) {
-                            activeCalcString += char; 
+                // Simplified: activeCalcString will be driven by what's allowed by keydown.
+                // The previous logic for activeCalcString building based on event.data might
+                // conflict if keydown already filtered.
+                // Let's adjust activeCalcString based on the current visual input if in lastInputMode.
+                
+                let currentVisualInput = inchInput.value;
+                if (currentVisualInput === "") {
+                    activeCalcString = "";
+                } else {
+                    // Try to extract the last valid number sequence from the visual input
+                    // This is tricky. The original 'activeCalcString' logic based on event.data was better
+                    // for the "latest typed number" concept.
+                    // For now, let's assume if isLastInputMode, the keydown has shaped the input,
+                    // and we use the *last character* if it's a digit or a dot (if valid).
+                    // This is a simplification of the original "latest number part" intent.
+
+                    const lastChar = currentVisualInput.slice(-1);
+                    if (lastChar >= '0' && lastChar <= '9') {
+                        if (activeCalcString.endsWith('.')) activeCalcString += lastChar;
+                        else activeCalcString = lastChar; // This makes it "last typed digit"
+                    } else if (lastChar === '.') {
+                        if (activeCalcString.match(/^[0-9]+$/) && !activeCalcString.includes('.')) {
+                             activeCalcString += '.';
+                        } else if (activeCalcString === "" || !activeCalcString.includes('.')){
+                             activeCalcString = "0.";
+                        }
+                        // If already has a dot, keydown should have prevented another.
+                    } else if (event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward') {
+                        // If deleting, try to rebuild activeCalcString from the remaining visual input
+                        // This is complex. A simpler approach for "last input mode" might be needed
+                        // if strict "latest number part" is desired with keydown filtering.
+                        // For now, let's make activeCalcString mirror the visual input if it's a valid start of a number
+                        if (/^-?\d*\.?\d*$/.test(currentVisualInput)) {
+                             activeCalcString = currentVisualInput; // Or a part of it
                         } else {
-                            activeCalcString = char; 
+                            // activeCalcString = ""; // Or try to salvage last valid part
                         }
-                    } else if (char === '.') { 
-                        if (activeCalcString.match(/^[0-9]+$/)) { 
-                            activeCalcString += '.'; 
-                        } else if (activeCalcString === "" || !activeCalcString.includes('.')){ 
-                             activeCalcString = "0."; 
+                         // The original activeCalcString logic based on event.data was more robust for this mode.
+                         // Reverting to a slightly modified version of that.
+                        const inputType = event.inputType;
+                        const data = event.data; // This will be null for backspace if keydown prevented default
+
+                        if (inputType === 'insertText' && data) { // data comes from allowed keys now
+                            const char = data;
+                            if (char >= '0' && char <= '9') { 
+                                if (activeCalcString.endsWith('.')) activeCalcString += char; 
+                                else activeCalcString = char; 
+                            } else if (char === '.') { 
+                                if (activeCalcString.match(/^[0-9]+$/) && !activeCalcString.includes('.')) activeCalcString += '.'; 
+                                else if (activeCalcString === "" || !activeCalcString.includes('.')) activeCalcString = "0."; 
+                            }
+                        } else if (inputType === 'deleteContentBackward') {
+                            // Visual input is already updated by browser before 'input' event for backspace
+                            // We need to update activeCalcString based on the new visual input
+                            // This is tricky because 'activeCalcString' was the source of truth for calc.
+                            // Let's try to derive from inchInput.value
+                            let temp = inchInput.value;
+                            if (temp === "") activeCalcString = "";
+                            else {
+                                // Attempt to make activeCalcString the last character if it's a digit,
+                                // or the full string if it looks like a number. This is imperfect for "last typed".
+                                if (temp.slice(-1) >= '0' && temp.slice(-1) <= '9') activeCalcString = temp.slice(-1);
+                                else if (temp.slice(-1) === '.' && temp.slice(0,-1).match(/^\d+$/) && !temp.slice(0,-1).includes('.')) activeCalcString = temp; // e.g. "123."
+                                else if (/^\d*\.?\d*$/.test(temp)) activeCalcString = temp; // if the whole thing is a number
+                                else activeCalcString = ""; // fallback
+                            }
+                        } else if (inputType === 'insertFromPaste') {
+                             const pastedText = inchInput.value; // Value after paste (and keydown filtering if any)
+                             if (/^-?\d*\.?\d+$/.test(pastedText) && !isNaN(parseFloat(pastedText)) && isFinite(parseFloat(pastedText))) {
+                                activeCalcString = pastedText;
+                             } else {
+                                activeCalcString = "";
+                             }
                         }
-                    } else { 
-                        activeCalcString = ""; 
-                    }
-                } else if (inputType === 'deleteContentBackward') {
-                    if (activeCalcString.length > 0) {
-                        activeCalcString = activeCalcString.slice(0, -1);
-                    }
-                } else if (inputType === 'insertFromPaste') {
-                    const pastedText = (event.clipboardData || window.clipboardData)?.getData('text/plain').trim();
-                    if (pastedText) {
-                        if (/^-?\d*\.?\d+$/.test(pastedText) && !isNaN(parseFloat(pastedText)) && isFinite(parseFloat(pastedText))) {
-                            activeCalcString = pastedText;
-                        } else {
-                            activeCalcString = "";
-                        }
+
+
                     }
                 }
             }
@@ -380,7 +467,7 @@
             radioDC4.addEventListener('change', function() {
                 if (this.checked) {
                     calculateAndDisplay();
-                    inchInput.focus(); // Focus after DC-4 selection
+                    inchInput.focus(); 
                 }
             });
         }
@@ -388,7 +475,7 @@
             radioSC2.addEventListener('change', function() {
                  if (this.checked) {
                     calculateAndDisplay();
-                    inchInput.focus(); // Focus after SC-2 selection
+                    inchInput.focus(); 
                  }
             });
         }
@@ -406,19 +493,20 @@
             activeCalcString = "";
 
             calculateAndDisplay(); 
-            // inchInput.focus(); // Focus is now handled in the specific event listeners
         }
 
         function calculateAndDisplay() {
             resultsOutput.innerHTML = '';
             
             const selectedTableRadio = document.querySelector('input[name="table_selection"]:checked');
-            let inchValueString;
+            let inchValueStringForCalc;
 
             if (isLastInputMode) {
-                inchValueString = activeCalcString;
+                // If activeCalcString is empty due to invalid sequence, but visual input might have something.
+                // We should use activeCalcString as the source for calculation in this mode.
+                inchValueStringForCalc = activeCalcString;
             } else {
-                inchValueString = inchInput.value;
+                inchValueStringForCalc = inchInput.value;
             }
 
             if (!selectedTableRadio) {
@@ -427,15 +515,18 @@
                 return;
             }
             
-            if (inchValueString.trim() === '') {
+            // Validate the string that will be used for calculation
+            if (inchValueStringForCalc.trim() === '') {
                 resultsTitle.style.display = 'none';
-                errorMessage.textContent = '';
+                // Clear error only if it wasn't due to previous invalid char in lastInputMode
+                if (!isLastInputMode || activeCalcString === "") errorMessage.textContent = '';
                 return;
             }
 
-            const inchValue = parseFloat(inchValueString);
+            const inchValue = parseFloat(inchValueStringForCalc);
             if (isNaN(inchValue)) {
-                errorMessage.textContent = `Error: "${inchValueString}" is not a valid number.`;
+                // Show error based on what was attempted for calculation
+                errorMessage.textContent = `Error: "${inchValueStringForCalc}" is not a valid number for calculation.`;
                 resultsTitle.style.display = 'none';
                 return;
             }
@@ -485,7 +576,7 @@
         }
         
         resetCalculator(); 
-        inchInput.focus(); // Initial focus on page load
+        inchInput.focus(); 
     </script>
 </body>
 </html>
