@@ -318,19 +318,22 @@
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             calculateAndDisplay();
+            inchInput.focus(); // Keep focus after explicit submit
         });
 
         mainTitle.addEventListener('click', function() {
             resetCalculator();
+            inchInput.focus(); // Focus after reset
         });
 
         lastInputModeToggle.addEventListener('change', function() {
             isLastInputMode = this.checked;
-            activeCalcString = ""; // Reset active string when mode changes
-            if (!isLastInputMode) { // If toggled OFF
-                inchInput.value = ''; // Clear the visual input field
+            activeCalcString = ""; 
+            if (!isLastInputMode) { 
+                inchInput.value = ''; 
             }
-            calculateAndDisplay(); // Recalculate based on new mode / cleared input
+            calculateAndDisplay(); 
+            inchInput.focus(); // Focus after toggle change
         });
 
         inchInput.addEventListener('input', function(event) {
@@ -340,20 +343,20 @@
 
                 if (inputType === 'insertText' && data) {
                     const char = data;
-                    if (char >= '0' && char <= '9') { // Digit typed
+                    if (char >= '0' && char <= '9') { 
                         if (activeCalcString.endsWith('.')) {
-                            activeCalcString += char; // e.g., "1." + "5" -> "1.5"
+                            activeCalcString += char; 
                         } else {
-                            activeCalcString = char; // Resets to the new digit, e.g., "4" then "5" -> "5"
+                            activeCalcString = char; 
                         }
-                    } else if (char === '.') { // Decimal point typed
-                        if (activeCalcString.match(/^[0-9]+$/)) { // If current is like "1", "12"
-                            activeCalcString += '.'; // Becomes "1.", "12."
-                        } else if (activeCalcString === "" || !activeCalcString.includes('.')){ // If current is empty or does not have a dot
-                             activeCalcString = "0."; // Start new with "0." if empty or make it "0." if it's not a number
+                    } else if (char === '.') { 
+                        if (activeCalcString.match(/^[0-9]+$/)) { 
+                            activeCalcString += '.'; 
+                        } else if (activeCalcString === "" || !activeCalcString.includes('.')){ 
+                             activeCalcString = "0."; 
                         }
-                    } else { // Non-numeric, non-dot character
-                        activeCalcString = ""; // Reset
+                    } else { 
+                        activeCalcString = ""; 
                     }
                 } else if (inputType === 'deleteContentBackward') {
                     if (activeCalcString.length > 0) {
@@ -362,7 +365,6 @@
                 } else if (inputType === 'insertFromPaste') {
                     const pastedText = (event.clipboardData || window.clipboardData)?.getData('text/plain').trim();
                     if (pastedText) {
-                        // Check if pasted text is a valid number string
                         if (/^-?\d*\.?\d+$/.test(pastedText) && !isNaN(parseFloat(pastedText)) && isFinite(parseFloat(pastedText))) {
                             activeCalcString = pastedText;
                         } else {
@@ -370,20 +372,24 @@
                         }
                     }
                 }
-                // For other input types, activeCalcString might not perfectly reflect the "latest typed number part"
-                // but this covers common typing, backspace, and paste scenarios.
             }
-            calculateAndDisplay(); // Always recalculate on input
+            calculateAndDisplay(); 
         });
 
         if (radioDC4) {
             radioDC4.addEventListener('change', function() {
-                if (this.checked) calculateAndDisplay();
+                if (this.checked) {
+                    calculateAndDisplay();
+                    inchInput.focus(); // Focus after DC-4 selection
+                }
             });
         }
         if (radioSC2) {
             radioSC2.addEventListener('change', function() {
-                 if (this.checked) calculateAndDisplay();
+                 if (this.checked) {
+                    calculateAndDisplay();
+                    inchInput.focus(); // Focus after SC-2 selection
+                 }
             });
         }
 
@@ -395,12 +401,12 @@
             resultsTitle.style.display = 'none';
             if(radioDC4) radioDC4.checked = true;
             
-            // Reset toggle switch and its mode
             if(lastInputModeToggle) lastInputModeToggle.checked = false;
             isLastInputMode = false;
             activeCalcString = "";
 
             calculateAndDisplay(); 
+            // inchInput.focus(); // Focus is now handled in the specific event listeners
         }
 
         function calculateAndDisplay() {
@@ -434,7 +440,7 @@
                 return;
             }
             
-            errorMessage.textContent = ''; // Clear error if input is valid
+            errorMessage.textContent = ''; 
 
             const selectedTable = selectedTableRadio.value;
             let i;
@@ -478,7 +484,8 @@
             }
         }
         
-        resetCalculator(); // Initial call to set a clean state
+        resetCalculator(); 
+        inchInput.focus(); // Initial focus on page load
     </script>
 </body>
 </html>
